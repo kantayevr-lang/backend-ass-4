@@ -1,0 +1,105 @@
+# Secure REST Blogging API (Node.js + MongoDB)
+
+## Overview
+A secure RESTful API for a simple blogging platform. Implements CRUD for blog posts, authentication, authorization (RBAC + ownership), and basic security controls.
+
+## Tech Stack
+- Node.js + Express
+- MongoDB (native driver)
+- JWT authentication
+- bcrypt password hashing
+
+## Setup (Local)
+1. Install dependencies:
+```bash
+npm install
+Create .env (copy from example):
+
+cp .env.example .env
+Run the server:
+
+npm run dev
+API will start at:
+
+http://localhost:3000
+
+Environment Variables
+Create a .env file in the project root:
+
+PORT=3000
+MONGO_URI=mongodb://localhost:27017
+DB_NAME=blog_api
+JWT_SECRET=your_secret_here
+JWT_EXPIRES_IN=1h
+Run with Docker
+Build & run API + MongoDB using Docker Compose:
+
+docker compose up --build
+Authentication Flow (JWT)
+Register: POST /auth/register
+
+Login: POST /auth/login → returns { token }
+
+Use token for protected endpoints:
+Authorization: Bearer <token>
+
+Get current user: GET /auth/me
+
+Logout: POST /auth/logout (client deletes token)
+
+API Endpoints
+Auth
+POST /auth/register — register new user
+
+POST /auth/login — login and receive JWT
+
+POST /auth/logout — logout (requires auth)
+
+GET /auth/me — current user (requires auth)
+
+Blogs
+POST /blogs — create blog post (requires auth)
+
+GET /blogs — list all posts (public)
+
+GET /blogs/:id — get one post (public)
+
+PUT /blogs/:id — update post (requires auth, author or admin)
+
+DELETE /blogs/:id — delete post (requires auth, author or admin)
+
+Authorization Rules
+Anyone can read posts (GET endpoints).
+
+Only authenticated users can create posts.
+
+Only the author of the post OR an admin can update/delete the post.
+
+Validation & Error Handling
+title and body are required for blog posts.
+
+Uses proper HTTP status codes: 400, 401, 403, 404, 500.
+
+Errors are returned without leaking internal server details.
+
+Security Measures
+Password hashing with bcrypt (salted)
+
+Generic login error message: "Invalid credentials"
+
+Rate limiting on authentication endpoints
+
+Basic input validation and sanitization
+
+JWT-based authentication for protected routes
+
+Testing
+A Postman/Insomnia collection is included to demonstrate:
+
+All endpoints
+
+Validation failures (400)
+
+Unauthenticated access blocked (401)
+
+Non-owner update/delete blocked (403)
